@@ -19,12 +19,13 @@
   },
   "homepage": "https://github.com/XO9A8/mern-devops-demo#readme",
   "lint-staged": {
-    "backend/**/*.js": "cd backend && npm run lint",
-    "frontend/**/*.{js,jsx}": "cd frontend && npm run lint"
+    "backend/**/*.js": "eslint --config backend/.eslintrc.json",
+    "frontend/**/*.{js,jsx}": "eslint --config frontend/.eslintrc.json"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.2.0",
     "@commitlint/config-conventional": "^20.2.0",
+    "eslint": "^8.55.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7"
   }
