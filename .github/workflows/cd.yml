@@ -38,8 +38,8 @@ jobs:
           kustomize edit set image backend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:${{ github.sha }}
           kustomize edit set image frontend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ github.sha }}
       
-      - name: Deploy to staging (Dry Run)
-        run: kubectl apply -k k8s/overlays/staging --dry-run=client
+      - name: Deploy to staging (Dry Run - Generate Manifests)
+        run: kustomize build k8s/overlays/staging
       
       # - name: Wait for rollout
       #   run: |
@@ -88,13 +88,13 @@ jobs:
           kustomize edit set image backend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:${{ steps.version.outputs.VERSION }}
           kustomize edit set image frontend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ steps.version.outputs.VERSION }}
       
-      - name: Deploy to production
-        run: kubectl apply -k k8s/overlays/prod
+      - name: Deploy to production (Dry Run - Generate Manifests)
+        run: kustomize build k8s/overlays/prod
       
-      - name: Wait for rollout
-        run: |
-          kubectl rollout status deployment/backend -n production --timeout=300s
-          kubectl rollout status deployment/frontend -n production --timeout=300s
+      # - name: Wait for rollout
+      #   run: |
+      #     kubectl rollout status deployment/backend -n production --timeout=300s
+      #     kubectl rollout status deployment/frontend -n production --timeout=300s
       
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
