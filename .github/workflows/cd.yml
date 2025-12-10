@@ -21,10 +21,10 @@ jobs:
       name: staging
       url: https://staging.myapp.com
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+        uses: azure/setup-kubectl@v4
       
       # - name: Configure kubectl
       #   run: |
@@ -67,10 +67,10 @@ jobs:
       name: production
       url: https://myapp.com
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+        uses: azure/setup-kubectl@v4
       
       - name: Configure kubectl
         run: |
@@ -96,7 +96,7 @@ jobs:
       #     kubectl rollout status deployment/frontend -n production --timeout=300s
       
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
       
