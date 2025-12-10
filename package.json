@@ -1,0 +1,30 @@
+{
+  "name": "mern-devops-demo",
+  "version": "1.0.0",
+  "description": "> A simple MERN application with industry-level DevOps setup.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XO9A8/mern-devops-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/XO9A8/mern-devops-demo/issues"
+  },
+  "homepage": "https://github.com/XO9A8/mern-devops-demo#readme",
+  "lint-staged": {
+    "backend/**/*.js": "cd backend && npm run lint",
+    "frontend/**/*.{js,jsx}": "cd frontend && npm run lint"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.2.0",
+    "@commitlint/config-conventional": "^20.2.0",
+    "lint-staged": "^16.2.7"
+  }
+}
