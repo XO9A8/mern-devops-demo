@@ -1,0 +1,15 @@
+# .github/CODEOWNERS
+* @yourorg/maintainers
+
+# DevOps
+/k8s/                       @yourorg/devops-team
+/docker-compose*.yml        @yourorg/devops-team
+Dockerfile*                 @yourorg/devops-team
+Makefile                    @yourorg/devops-team
+/.github/workflows/         @yourorg/devops-team
+
+# Backend
+/backend/                   @yourorg/backend-team
+
+# Frontend
+/frontend/                  @yourorg/frontend-team

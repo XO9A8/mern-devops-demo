@@ -1,0 +1,28 @@
+# k8s/base/pdb.yaml - Pod Disruption Budget
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: backend-pdb
+  labels:
+    app: mern-demo
+    component: backend
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: mern-demo
+      component: backend
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: frontend-pdb
+  labels:
+    app: mern-demo
+    component: frontend
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: mern-demo
+      component: frontend

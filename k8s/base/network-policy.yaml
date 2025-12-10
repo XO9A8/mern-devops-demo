@@ -1,0 +1,88 @@
+# k8s/base/network-policy.yaml - Network Segmentation
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: backend-netpol
+  labels:
+    app: mern-demo
+spec:
+  podSelector:
+    matchLabels:
+      app: mern-demo
+      component: backend
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from frontend only
+    - from:
+        - podSelector:
+            matchLabels:
+              app: mern-demo
+              component: frontend
+      ports:
+        - protocol: TCP
+          port: 5000
+    # Allow traffic from ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 5000
+  egress:
+    # Allow MongoDB connection
+    - to:
+        - podSelector:
+            matchLabels:
+              app: mongo
+      ports:
+        - protocol: TCP
+          port: 27017
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: frontend-netpol
+  labels:
+    app: mern-demo
+spec:
+  podSelector:
+    matchLabels:
+      app: mern-demo
+      component: frontend
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow from ingress controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    # Allow to backend only
+    - to:
+        - podSelector:
+            matchLabels:
+              app: mern-demo
+              component: backend
+      ports:
+        - protocol: TCP
+          port: 5000
+    # Allow DNS
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53

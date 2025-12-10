@@ -1,0 +1,31 @@
+# backend/Dockerfile.staging
+# Staging environment - mirrors production but with staging configuration
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+# In staging, we might want to run some integration tests, so we might keep devDependencies
+# passed as a build arg, or we just install production for fidelity.
+# For this demo, let's keep it clean.
+RUN npm ci --only=production && npm cache clean --force
+
+FROM node:20-alpine AS staging
+RUN addgroup -g 1001 app && adduser -u 1001 -G app -s /bin/sh -D app
+
+WORKDIR /app
+
+COPY --from=builder --chown=app:app /app/node_modules ./node_modules
+COPY --chown=app:app . .
+
+# Remove unnecessary files
+RUN rm -rf tests/ *.test.js .env.* Dockerfile*
+
+USER app
+EXPOSE 5000
+
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s \
+    CMD wget -q --spider http://localhost:5000/health || exit 1
+
+# Explicitly use staging environment
+ENV NODE_ENV=staging
+CMD ["node", "src/server.js"]

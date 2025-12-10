@@ -1,0 +1,38 @@
+# .dockerignore for frontend
+node_modules
+npm-debug.log*
+
+# Git
+.git
+.gitignore
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Tests
+tests/
+*.test.js
+*.spec.js
+coverage/
+
+# Documentation
+*.md
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build (we rebuild in container)
+dist/
+build/

@@ -1,0 +1,16 @@
+# backend/Dockerfile.dev
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install nodemon for hot reload
+RUN npm install -g nodemon
+
+COPY package*.json ./
+RUN npm install
+
+# Source code mounted as volume (not copied)
+EXPOSE 5000
+EXPOSE 9229
+
+CMD ["nodemon", "--inspect=0.0.0.0:9229", "src/server.js"]

@@ -1,0 +1,31 @@
+# k8s/overlays/staging/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: staging
+
+resources:
+  - ../../base
+
+images:
+  - name: backend
+    newName: ghcr.io/yourorg/mern-demo-backend
+    newTag: latest
+  - name: frontend
+    newName: ghcr.io/yourorg/mern-demo-frontend
+    newTag: latest
+
+replicas:
+  - name: backend
+    count: 2
+  - name: frontend
+    count: 2
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/rules/0/host
+        value: staging.myapp.com
+    target:
+      kind: Ingress
+      name: mern-demo-ingress

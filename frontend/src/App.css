@@ -1,0 +1,88 @@
+:root {
+  --primary: #646cff;
+  --bg: #242424;
+  --card-bg: #1a1a1a;
+  --text: rgba(255, 255, 255, 0.87);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #888;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.card h2 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+}
+
+.card ul {
+  list-style: none;
+}
+
+.card li {
+  padding: 0.5rem 0;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: bold;
+}
+
+.status .indicator {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #888;
+}
+
+.status.healthy .indicator {
+  background: #4ade80;
+}
+
+.status.unhealthy .indicator {
+  background: #f87171;
+}
+
+footer {
+  text-align: center;
+  margin-top: 2rem;
+  color: #666;
+}
