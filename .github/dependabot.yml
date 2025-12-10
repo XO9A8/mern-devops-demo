@@ -5,6 +5,10 @@ updates:
     directory: "/backend"
     schedule:
       interval: "weekly"
+    groups:
+      backend-dependencies:
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "backend"
@@ -14,6 +18,10 @@ updates:
     directory: "/frontend"
     schedule:
       interval: "weekly"
+    groups:
+      frontend-dependencies:
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "frontend"
@@ -23,6 +31,10 @@ updates:
     directory: "/backend"
     schedule:
       interval: "weekly"
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "docker"
@@ -31,6 +43,10 @@ updates:
     directory: "/frontend"
     schedule:
       interval: "weekly"
+    groups:
+      docker-dependencies:
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "docker"
@@ -40,6 +56,10 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      actions-dependencies:
+        patterns:
+          - "*"
     labels:
       - "dependencies"
       - "ci"
