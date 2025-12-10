@@ -14,19 +14,47 @@ concurrency:
 
 env:
   REGISTRY: docker.io
-  # Use DOCKER_USERNAME if set, otherwise fallback to github.repository_owner (but Docker Hub usually requires specific user)
-  # For this demo, we assume the user will set DOCKER_USERNAME secret
   IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/mern-devops-demo
-
-
 
 jobs:
   # ============================================
-  # Test Backend
+  # Detect Changes (Smart Filtering)
+  # ============================================
+  changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      docker: ${{ steps.filter.outputs.docker }}
+      ci: ${{ steps.filter.outputs.ci }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+              - 'package.json'
+            frontend:
+              - 'frontend/**'
+              - 'package.json'
+            docker:
+              - '**/Dockerfile*'
+              - 'docker-compose*.yml'
+            ci:
+              - '.github/workflows/ci.yml'
+
+  # ============================================
+  # Test Backend (only if backend changed)
   # ============================================
   test-backend:
     name: Test Backend
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.ci == 'true'
     defaults:
       run:
         working-directory: ./backend
@@ -49,11 +77,13 @@ jobs:
         run: npm test
 
   # ============================================
-  # Test Frontend
+  # Test Frontend (only if frontend changed)
   # ============================================
   test-frontend:
     name: Test Frontend
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.ci == 'true'
     defaults:
       run:
         working-directory: ./frontend
@@ -79,11 +109,13 @@ jobs:
         run: npm run build
 
   # ============================================
-  # Security Scan (Trivy)
+  # Security Scan (always runs for safety)
   # ============================================
   security-scan:
     name: Security Scan
     runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.ci == 'true'
     steps:
       - uses: actions/checkout@v4
       
@@ -94,14 +126,20 @@ jobs:
           ignore-unfixed: true
           format: 'table'
           exit-code: '1'
-          severity: 'CRITICAL' 
+          severity: 'CRITICAL'
+
   # ============================================
-  # Build Docker Images
+  # Build Docker Images (only if code/docker changed)
   # ============================================
   build:
     name: Build Images
     runs-on: ubuntu-latest
-    needs: [test-backend, test-frontend]
+    needs: [changes, test-backend, test-frontend]
+    if: |
+      always() &&
+      (needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.docker == 'true') &&
+      (needs.test-backend.result == 'success' || needs.test-backend.result == 'skipped') &&
+      (needs.test-frontend.result == 'success' || needs.test-frontend.result == 'skipped')
     steps:
       - uses: actions/checkout@v4
       
@@ -115,6 +153,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       
       - name: Build backend
+        if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.docker == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./backend
@@ -127,6 +166,7 @@ jobs:
           cache-to: type=gha,mode=max
       
       - name: Build frontend
+        if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.docker == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./frontend

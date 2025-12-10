@@ -3,6 +3,13 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'package.json'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
 
 permissions:
   contents: write

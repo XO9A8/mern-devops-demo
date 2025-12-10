@@ -44,17 +44,29 @@ A **Microservices-ready** MERN application containerized with Docker and orchest
 
 ### B. CI Pipeline (`.github/workflows/ci.yml`)
 
-| Job | Purpose | Key Features |
-|-----|---------|--------------|
-| **test-backend** | Quality gate | ESLint + Jest (82% coverage) |
-| **test-frontend** | Quality gate | ESLint + Vitest |
-| **security-scan** | Vulnerability detection | Trivy (fails on CRITICAL, pinned to v0.28.0) |
-| **build** | Docker images | Immutable SHA tags + GHA caching |
+**Smart Change Detection** using `dorny/paths-filter`:
+```
+changes job → detects what changed → conditionally runs:
+  ├─ test-backend (if backend/** changed)
+  ├─ test-frontend (if frontend/** changed)
+  ├─ security-scan (if any code changed)
+  └─ build (only rebuilds changed images)
+```
+
+| Job | Purpose | Runs When |
+|-----|---------|-----------|
+| **changes** | Detect file changes | Always (fast) |
+| **test-backend** | ESLint + Jest | `backend/**` changed |
+| **test-frontend** | ESLint + Vitest | `frontend/**` changed |
+| **security-scan** | Trivy (CRITICAL) | Any code changed |
+| **build** | Docker images | Code or Dockerfile changed |
 
 **Enterprise Features:**
+- ✅ Dynamic change detection (not static path filters)
+- ✅ Per-job skipping (saves CI minutes)
+- ✅ Conditional image builds (only rebuild what changed)
 - ✅ Concurrency control (cancels duplicate runs)
 - ✅ Pinned action versions (no `@master` tags)
-- ✅ No debug steps that leak secrets
 
 ### C. CD Pipeline (`.github/workflows/cd.yml`)
 

@@ -4,6 +4,13 @@ name: CD Pipeline
 on:
   push:
     branches: [main]
+    paths:
+      - 'k8s/**'
+      - 'backend/**'
+      - 'frontend/**'
+      - '.github/workflows/cd.yml'
+    paths-ignore:
+      - '**.md'
     tags: ['v*']
 
 # Prevent concurrent deployments - don't cancel in-progress
