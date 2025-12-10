@@ -9,10 +9,10 @@ resources:
 
 images:
   - name: backend
-    newName: docker.io/YOUR_DOCKER_USERNAME/mern-devops-demo-backend
+    newName: docker.io/x08a8/mern-devops-demo-backend
     newTag: v1.0.0
   - name: frontend
-    newName: docker.io/YOUR_DOCKER_USERNAME/mern-devops-demo-frontend
+    newName: docker.io/x08a8/mern-devops-demo-frontend
     newTag: v1.0.0
 
 replicas:

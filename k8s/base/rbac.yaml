@@ -1,0 +1,35 @@
+# k8s/base/rbac.yaml - ServiceAccounts and RBAC
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mern-demo-sa
+  labels:
+    app: mern-demo
+automountServiceAccountToken: false
+---
+# Role for application pods (minimal permissions)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: mern-demo-role
+  labels:
+    app: mern-demo
+rules:
+  # Allow pods to read their own configmaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: mern-demo-rolebinding
+  labels:
+    app: mern-demo
+subjects:
+  - kind: ServiceAccount
+    name: mern-demo-sa
+roleRef:
+  kind: Role
+  name: mern-demo-role
+  apiGroup: rbac.authorization.k8s.io

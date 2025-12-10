@@ -1,7 +1,7 @@
 # MERN DevOps Demo - Comprehensive Project Walkthrough
 
 **Date:** December 10, 2025  
-**Status:** Enterprise-Grade CI/CD Complete (Pre-Kubernetes Deployment)
+**Status:** ✅ Enterprise-Grade CI/CD + Kubernetes Deployed
 
 This document provides a detailed technical overview of the MERN Stack DevOps setup. It covers the architectural decisions, implementation details, and the "Enterprise-Grade" standards applied.
 
@@ -16,7 +16,7 @@ A **Microservices-ready** MERN application containerized with Docker and orchest
 |-------|------------|
 | Frontend | React (Vite) |
 | Backend | Node.js (Express) |
-| Database | MongoDB (Containerized) |
+| Database | MongoDB (StatefulSet in K8s) |
 | DevOps | Docker, GitHub Actions, Trivy, Husky, Commitlint, Semantic Release |
 | Infrastructure | Kubernetes (Kustomize), Network Policies, HPA, PDB |
 
@@ -91,8 +91,6 @@ Automated versioning based on Conventional Commits:
 | `perf:` | Patch | ⚡ Performance |
 | `BREAKING CHANGE` | Major (x.0.0) | 💥 Breaking |
 
-**Plugins:** commit-analyzer, release-notes-generator, changelog, git, github
-
 ### E. Pre-commit Hooks (Husky)
 
 | Hook | Tool | Action |
@@ -100,44 +98,55 @@ Automated versioning based on Conventional Commits:
 | `pre-commit` | lint-staged | Runs ESLint on staged files |
 | `commit-msg` | commitlint | Validates Conventional Commits |
 
-### F. Kubernetes Manifests (`k8s/`)
+### F. Kubernetes Deployment (`k8s/`)
 
-| Resource | Purpose |
-|----------|---------|
-| `backend-deployment.yaml` | Resource limits, liveness/readiness probes |
-| `frontend-deployment.yaml` | Nginx serving, health checks |
-| `hpa.yaml` | Auto-scaling (2-10 replicas, 70% CPU) |
-| `pdb.yaml` | Pod Disruption Budget (minAvailable: 1) |
-| `network-policy.yaml` | Least-privilege network segmentation |
-| `secrets.yaml` | K8s Secrets for app config |
+**Production-Grade Best Practices Implemented:**
+
+| Category | Resource | Description |
+|----------|----------|-------------|
+| **Security** | SecurityContext | `runAsNonRoot`, `readOnlyRootFilesystem`, drop all capabilities |
+| **Security** | ServiceAccount | Dedicated SA with `automountServiceAccountToken: false` |
+| **Security** | RBAC | Minimal Role + RoleBinding |
+| **Resources** | ResourceQuota | Namespace limits (CPU: 8, Memory: 8Gi, Pods: 20) |
+| **Resources** | LimitRange | Default container limits |
+| **Config** | ConfigMap | Non-secret config separated from Secrets |
+| **HA** | Pod Anti-Affinity | Spread pods across nodes |
+| **HA** | HPA | Auto-scaling (2-10 replicas) |
+| **HA** | PDB | minAvailable: 1 |
+| **Network** | NetworkPolicies | Least-privilege segmentation |
+| **Observability** | Prometheus Annotations | `prometheus.io/scrape: true` |
+
+**Access Services:**
+```bash
+kubectl port-forward -n staging svc/backend 5000:5000
+kubectl port-forward -n staging svc/frontend 8080:80
+```
 
 ### G. Security Headers (Nginx)
 
 ```
 X-Frame-Options: SAMEORIGIN
 X-Content-Type-Options: nosniff
-X-XSS-Protection: 1; mode=block
 Strict-Transport-Security: max-age=31536000; includeSubDomains
 Content-Security-Policy: default-src 'self'...
 Referrer-Policy: strict-origin-when-cross-origin
-Permissions-Policy: camera=(), microphone=(), geolocation=()
 ```
 
 ---
 
 ## 3. How to Work with This Project
 
-### **Local Development**
+### **Local Development (Docker Compose)**
 ```bash
 make dev
 # Frontend: http://localhost:5173
 # Backend: http://localhost:5000
 ```
 
-### **Production Build (Local)**
+### **Kubernetes Deployment**
 ```bash
-make prod-build && make prod
-# Frontend (Nginx): http://localhost:80
+kubectl apply -k k8s/overlays/staging
+kubectl get pods -n staging
 ```
 
 ### **Making a Code Change**
@@ -155,17 +164,41 @@ git push origin main                    # CI/CD runs automatically
 |-------|----------|
 | React 19 peer deps | `npm ci --legacy-peer-deps` |
 | Docker Hub auth | Use username (not email) + Personal Access Token |
-| Volume permissions | `make setup` fixes ownership |
 | lint-staged on Windows | Use ESLint directly with `--config` flag |
-| Semantic Release npm error | Configured to skip npm publishing |
-| Server tests failing | Added `require.main === module` check for test isolation |
+| MongoDB probe timeouts | Use TCP socket probe instead of mongosh command |
+| Server tests failing | Added `require.main === module` check |
 
 ---
 
-## 5. Future Roadmap
+## 5. ArgoCD GitOps
 
-| Phase | Items |
-|-------|-------|
-| **Kubernetes** | Deploy to Docker Desktop K8s, ArgoCD GitOps |
-| **Monitoring** | Prometheus + Grafana observability stack |
-| **E2E Testing** | Cypress or Playwright integration |
+**Installed in cluster with auto-sync:**
+
+```bash
+# Access ArgoCD UI
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+
+# Open: https://localhost:8080
+# Username: admin
+# Password: (run below command)
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+```
+
+| Environment | Auto-Sync | Path |
+|-------------|-----------|------|
+| Staging | ✅ Yes | `k8s/overlays/staging` |
+| Production | ❌ Manual | `k8s/overlays/prod` |
+
+---
+
+## 6. Future Roadmap
+
+| Phase | Status |
+|-------|--------|
+| **CI/CD Pipelines** | ✅ Complete |
+| **Local K8s Deployment** | ✅ Complete |
+| **K8s Best Practices** | ✅ Complete |
+| **ArgoCD (GitOps)** | ✅ Complete |
+| **Monitoring (Prometheus/Grafana)** | ⏳ Planned |
+| **E2E Testing** | ⏳ Planned |
+| **E2E Testing** | ⏳ Planned |

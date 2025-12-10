@@ -1,0 +1,48 @@
+# k8s/base/resource-quota.yaml - Namespace Resource Limits
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: mern-demo-quota
+  labels:
+    app: mern-demo
+spec:
+  hard:
+    # Limit total resources in namespace
+    requests.cpu: "4"
+    requests.memory: 4Gi
+    limits.cpu: "8"
+    limits.memory: 8Gi
+    # Limit number of objects
+    pods: "20"
+    services: "10"
+    secrets: "10"
+    configmaps: "10"
+    persistentvolumeclaims: "5"
+---
+# LimitRange - Default limits for pods without explicit limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: mern-demo-limits
+  labels:
+    app: mern-demo
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: "200m"
+        memory: "256Mi"
+      defaultRequest:
+        cpu: "50m"
+        memory: "64Mi"
+      max:
+        cpu: "2"
+        memory: "2Gi"
+      min:
+        cpu: "10m"
+        memory: "32Mi"
+    - type: PersistentVolumeClaim
+      max:
+        storage: "10Gi"
+      min:
+        storage: "100Mi"

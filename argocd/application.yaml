@@ -1,0 +1,35 @@
+# argocd/application.yaml - ArgoCD Application for MERN Demo
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: mern-demo-staging
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  
+  source:
+    # Your Git repository
+    repoURL: https://github.com/XO9A8/mern-devops-demo.git
+    targetRevision: main
+    path: k8s/overlays/staging
+  
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: staging
+  
+  syncPolicy:
+    automated:
+      prune: true        # Delete resources removed from Git
+      selfHeal: true     # Revert manual changes to match Git
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

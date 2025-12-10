@@ -3,8 +3,12 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+  - rbac.yaml
+  - configmap.yaml
+  - resource-quota.yaml
   - backend-deployment.yaml
   - frontend-deployment.yaml
+  - mongodb.yaml
   - secrets.yaml
   - ingress.yaml
   - hpa.yaml

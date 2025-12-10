@@ -1,0 +1,16 @@
+# k8s/base/configmap.yaml - Non-secret Configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    app: mern-demo
+data:
+  # Application configuration (non-sensitive)
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  API_TIMEOUT: "30000"
+  CORS_ORIGIN: "*"
+  # Feature flags
+  ENABLE_METRICS: "true"
+  ENABLE_HEALTH_DETAILS: "false"
