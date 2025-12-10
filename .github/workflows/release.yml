@@ -5,7 +5,7 @@ on:
       - main
 
 permissions:
-  contents: write # Required for creating releases
+  contents: write
   issues: write
   pull-requests: write
 
@@ -17,7 +17,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Required for analyzing commit history
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -26,36 +27,11 @@ jobs:
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v4
+        with:
+          semantic_version: 23
+          extra_plugins: |
+            @semantic-release/changelog@6
+            @semantic-release/git@10
+            conventional-changelog-conventionalcommits@7
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          semantic_version: 19
-          branches: |
-            [
-              '+([0-9])?(.{+([0-9]),x}).x',
-              'main',
-              'next',
-              'next-major',
-              {name: 'beta', prerelease: true},
-              {name: 'alpha', prerelease: true}
-            ]
-          extra_plugins: |
-            @semantic-release/changelog
-            @semantic-release/git
-            @semantic-release/exec
-          # Skip npm publishing - we only want GitHub releases
-          extends: |
-            [
-              {
-                "plugins": [
-                  "@semantic-release/commit-analyzer",
-                  "@semantic-release/release-notes-generator",
-                  "@semantic-release/changelog",
-                  ["@semantic-release/git", {
-                    "assets": ["CHANGELOG.md"],
-                    "message": "chore(release): ${nextRelease.version} [skip ci]"
-                  }],
-                  "@semantic-release/github"
-                ]
-              }
-            ]
