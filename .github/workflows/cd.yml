@@ -46,16 +46,16 @@ jobs:
       #     kubectl rollout status deployment/backend -n staging --timeout=300s
       #     kubectl rollout status deployment/frontend -n staging --timeout=300s
       
-      - name: Notify Slack
-        if: always()
-        uses: slackapi/slack-github-action@v1
-        with:
-          payload: |
-            {
-              "text": "Staging deployment ${{ job.status }}: ${{ github.sha }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      # - name: Notify Slack
+      #   if: always()
+      #   uses: slackapi/slack-github-action@v1
+      #   with:
+      #     payload: |
+      #       {
+      #         "text": "Staging deployment ${{ job.status }}: ${{ github.sha }}"
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
   # ============================================
   # Deploy to Production (on tag)
@@ -101,13 +101,13 @@ jobs:
         with:
           generate_release_notes: true
       
-      - name: Notify Slack
-        if: always()
-        uses: slackapi/slack-github-action@v1
-        with:
-          payload: |
-            {
-              "text": "🚀 Production deployment ${{ job.status }}: ${{ steps.version.outputs.VERSION }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      # - name: Notify Slack
+      #   if: always()
+      #   uses: slackapi/slack-github-action@v1
+      #   with:
+      #     payload: |
+      #       {
+      #         "text": "🚀 Production deployment ${{ job.status }}: ${{ steps.version.outputs.VERSION }}"
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
