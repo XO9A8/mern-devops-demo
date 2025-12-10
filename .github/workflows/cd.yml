@@ -9,8 +9,6 @@ on:
       - 'backend/**'
       - 'frontend/**'
       - '.github/workflows/cd.yml'
-    paths-ignore:
-      - '**.md'
     tags: ['v*']
 
 # Prevent concurrent deployments - don't cancel in-progress
