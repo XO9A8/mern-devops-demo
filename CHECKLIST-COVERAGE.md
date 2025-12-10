@@ -24,13 +24,13 @@
 |------|--------|----------------|
 | Branching strategy | ✅ | `main ← develop ← feature/*` |
 | `.gitignore` | ✅ | `.gitignore` |
-| `.gitattributes` | ⏳ | Add tomorrow |
+| `.gitattributes` | ✅ | `.gitattributes` (text=auto, eol=lf) |
 | Branch protection | ⏳ | Configure on GitHub |
 | CODEOWNERS | ✅ | `.github/CODEOWNERS` |
-| Dependabot | ⏳ | Add tomorrow |
+| Dependabot | ✅ | `.github/dependabot.yml` with grouping |
 | PR template | ✅ | `.github/pull_request_template.md` |
 | Commit conventions | ✅ | Conventional commits |
-| Pre-commit hooks | ⏳ | Add Husky tomorrow |
+| Pre-commit hooks | ✅ | Husky + lint-staged + commitlint |
 
 ---
 
@@ -43,7 +43,7 @@
 | Docker multi-stage | ✅ | `Dockerfile.prod` |
 | BuildKit | ✅ | Enabled in workflow |
 | Docker caching | ✅ | `cache-from: type=gha` |
-| Concurrency control | ⏳ | Add to workflow |
+| Concurrency control | ✅ | `ci.yml` lines 11-13 |
 
 ---
 
@@ -65,8 +65,8 @@
 |------|--------|----------------|
 | Container registry | ✅ | GitHub Container Registry |
 | Image tagging | ✅ | `sha`, `branch`, `semver` |
-| Semantic release | ⏳ | Add tomorrow |
-| Changelog | ⏳ | Add with semantic-release |
+| Semantic release | ✅ | `.github/workflows/release.yml` |
+| Changelog | ✅ | `@semantic-release/changelog` plugin |
 
 ---
 
@@ -92,8 +92,8 @@
 | Liveness probes | ✅ | In K8s deployments |
 | Readiness probes | ✅ | In K8s deployments |
 | HPA | ✅ | `k8s/base/hpa.yaml` |
-| PDB | ⏳ | Add tomorrow |
-| Network policies | ⏳ | Add tomorrow |
+| PDB | ✅ | `k8s/base/pdb.yaml` |
+| Network policies | ✅ | `k8s/base/network-policy.yaml` |
 
 ---
 
