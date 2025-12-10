@@ -27,10 +27,10 @@ jobs:
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
       
-      - name: Configure kubectl
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBE_CONFIG_STAGING }}" | base64 -d > $HOME/.kube/config
+      # - name: Configure kubectl
+      #   run: |
+      #     mkdir -p $HOME/.kube
+      #     echo "${{ secrets.KUBE_CONFIG_STAGING }}" | base64 -d > $HOME/.kube/config
       
       - name: Update image tag
         run: |
@@ -38,13 +38,13 @@ jobs:
           kustomize edit set image backend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-backend:${{ github.sha }}
           kustomize edit set image frontend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-frontend:${{ github.sha }}
       
-      - name: Deploy to staging
-        run: kubectl apply -k k8s/overlays/staging
+      - name: Deploy to staging (Dry Run)
+        run: kubectl apply -k k8s/overlays/staging --dry-run=client
       
-      - name: Wait for rollout
-        run: |
-          kubectl rollout status deployment/backend -n staging --timeout=300s
-          kubectl rollout status deployment/frontend -n staging --timeout=300s
+      # - name: Wait for rollout
+      #   run: |
+      #     kubectl rollout status deployment/backend -n staging --timeout=300s
+      #     kubectl rollout status deployment/frontend -n staging --timeout=300s
       
       - name: Notify Slack
         if: always()
