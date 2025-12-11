@@ -167,31 +167,131 @@ git push origin main                    # CI/CD runs automatically
 | lint-staged on Windows | Use ESLint directly with `--config` flag |
 | MongoDB probe timeouts | Use TCP socket probe instead of mongosh command |
 | Server tests failing | Added `require.main === module` check |
-
 ---
 
 ## 5. ArgoCD GitOps
 
-**Installed in cluster with auto-sync:**
+### What is GitOps?
+GitOps is the **industry-standard** practice of using Git as the single source of truth for infrastructure. ArgoCD watches your Git repo and automatically syncs changes to Kubernetes.
 
-```bash
-# Access ArgoCD UI
-kubectl port-forward svc/argocd-server -n argocd 8080:443
+### How It Works
 
-# Open: https://localhost:8080
-# Username: admin
-# Password: (run below command)
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+```
+┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
+│ Developer│───▶│  GitHub  │───▶│  ArgoCD  │───▶│   K8s    │
+│ git push │    │   Repo   │    │ (watches)│    │ Cluster  │
+└──────────┘    └──────────┘    └──────────┘    └──────────┘
+                     │               │
+                     │    Detects    │
+                     │    changes    │
+                     └───────────────┘
 ```
 
-| Environment | Auto-Sync | Path |
-|-------------|-----------|------|
-| Staging | ✅ Yes | `k8s/overlays/staging` |
-| Production | ❌ Manual | `k8s/overlays/prod` |
+### What We Configured
+
+| Setting | Value | Why |
+|---------|-------|-----|
+| **Auto-sync (Staging)** | ✅ Enabled | Instant deploys on push |
+| **Auto-sync (Prod)** | ❌ Disabled | Manual approval for safety |
+| **Self-heal** | ✅ Enabled | Reverts manual kubectl changes |
+| **Prune** | ✅ Enabled | Deletes resources removed from Git |
+| **Retry** | 5 attempts | Resilient to temporary failures |
+
+### Industry Standard Practices ✅
+
+| Practice | Our Implementation | Used By |
+|----------|-------------------|---------|
+| **GitOps Model** | ArgoCD watches Git | Netflix, Intuit, Adobe |
+| **Declarative Config** | Kustomize overlays | Google, Spotify |
+| **Environment Separation** | staging/prod overlays | All enterprises |
+| **Auto-sync for Dev/Staging** | ✅ Enabled | Standard practice |
+| **Manual sync for Prod** | ✅ Enabled | Regulatory compliance |
+| **Self-healing** | ✅ Enabled | Drift prevention |
+| **NGINX Ingress Controller** | ✅ Installed | Kubernetes standard |
+
+### Access ArgoCD UI
+
+```bash
+kubectl port-forward svc/argocd-server -n argocd 8080:443
+# Open: https://localhost:8080
+# Username: admin
+# Password: kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.password}' | base64 -d
+```
+
+### Files Created
+
+| File | Purpose |
+|------|---------|
+| `argocd/application.yaml` | Staging app (auto-sync) |
+| `argocd/application-prod.yaml` | Production app (manual) |
 
 ---
 
-## 6. Future Roadmap
+## 6. Prometheus & Grafana Monitoring
+
+### What's Installed
+
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| **Prometheus** | Metrics collection | ✅ Running |
+| **Grafana** | Dashboards & visualization | ✅ Running |
+| **AlertManager** | Alert routing | ✅ Running |
+| **kube-state-metrics** | K8s resource metrics | ✅ Running |
+
+### Access Dashboards
+
+```bash
+# Grafana (Dashboards)
+kubectl port-forward svc/prometheus-grafana -n monitoring 3000:80
+# Open: http://localhost:3000
+# Username: admin | Password: admin123
+
+# Prometheus (Query metrics)
+kubectl port-forward svc/prometheus-kube-prometheus-prometheus -n monitoring 9090:9090
+# Open: http://localhost:9090
+```
+
+### Pre-Built Dashboards
+
+Grafana comes with 15+ Kubernetes dashboards including:
+- Kubernetes / Compute Resources / Cluster
+- Kubernetes / Compute Resources / Namespace (Pods)
+- Node Exporter / Nodes
+
+---
+
+## 7. E2E Testing (Playwright)
+
+### What's Configured
+
+| Item | Details |
+|------|---------|
+| **Framework** | Playwright (Microsoft) |
+| **Browser** | Chromium |
+| **Test Location** | `frontend/e2e/*.spec.ts` |
+| **Auto-start** | Vite dev server starts automatically |
+
+### Run E2E Tests
+
+```bash
+cd frontend
+
+# Run tests (headless)
+npm run test:e2e
+
+# Run with UI (interactive)
+npm run test:e2e:ui
+```
+
+### Test Coverage
+
+- ✅ Page loads correctly
+- ✅ Main content visible
+- ✅ Navigation works
+
+---
+
+## 8. Project Complete! 🎉
 
 | Phase | Status |
 |-------|--------|
@@ -199,6 +299,6 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath='{.data.pas
 | **Local K8s Deployment** | ✅ Complete |
 | **K8s Best Practices** | ✅ Complete |
 | **ArgoCD (GitOps)** | ✅ Complete |
-| **Monitoring (Prometheus/Grafana)** | ⏳ Planned |
-| **E2E Testing** | ⏳ Planned |
-| **E2E Testing** | ⏳ Planned |
+| **NGINX Ingress** | ✅ Complete |
+| **Monitoring (Prometheus/Grafana)** | ✅ Complete |
+| **E2E Testing (Playwright)** | ✅ Complete |
